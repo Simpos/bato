@@ -1,5 +1,6 @@
 import pygame
 from math import sqrt
+from vector import *
 from physics import *
 from maf import *
 
@@ -8,7 +9,7 @@ SIZE = 10
 COTE = sqrt(2) * SIZE
 
 class Bateau:
-    def __init__(self,x,y,vx,vy,ax,ay,angle,voile,screen):
+    def __init__(self,x,y,vx,vy,ax,ay,angle):
         """
             x,y : position
             vx,vy : speed,
@@ -23,19 +24,35 @@ class Bateau:
         self.ax = ax
         self.ay = ay
         self.angle = angle
-        self.voile = voile
-        self.screen = screen
-        self.rect = pygame.Rect(self.x,self.y,SIZE,SIZE)
-
+        self.surface = pygame.Surface((SIZE,SIZE),pygame.SRCALPHA)
+        self.surface.fill(BLACK)
+        self.rotated_surface = self.surface
+        self.rect = self.surface.get_rect()
+        self.profilVoile = [1,2,3]
+        self.actifProfilVoile = 0
+        self.direction = Vector(self.vx,self.vy)
 
     def calculateSpeed(self):
         pass
 
     def rotate(self,pro):
         self.angle += pro
-        x,y=prodMat(self.angle,self.x+640,360+self.y)
-        self.rect = pygame.Rect(x,y,SIZE,SIZE)
+        #SURFACE
+        self.rotated_surface = pygame.transform.rotate(self.surface,self.angle)
+        self.rect = self.rotated_surface.get_rect(center = (self.x,self.y))
+        #DIRECTION
+        norme = self.direction.norme()
+        angles = convertion(self.direction.angle + self.angle)
+        new = Vector(cos(angles),sin(angles))
+        self.direction = new.prod(norme)
 
+    def changeVoile(self,direct:bool):
+        if direct:
+            if self.actifProfilVoile < len(self.profilVoile):
+                self.actifProfilVoile += 1
+        else:
+            if self.actifProfilVoile > 0:
+                self.profilVoile -= 1
 
-    def draw_boat(self):
-        pygame.draw.rect(self.screen,BLACK,self.rect)
+    def __repr__(self):
+        return f"{self.x} {self.y}"

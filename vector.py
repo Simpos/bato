@@ -9,7 +9,14 @@ class Vector:
         if self.x == 0 and self.y == 0:
             self.angle = 0
         else:
-            self.angle = asin(self.y / self.x % pi/2)
+            try:
+                self.angle = asin((self.y / self.x) % (pi/2))
+            except ValueError:
+                print("Error", self.y / self.x)
+                self.angle = 0
+            except ZeroDivisionError:
+                print("AAA")
+                self.angle = 0
 
     def norme(self):
         return sqrt(self.x**2+self.y**2)
@@ -22,3 +29,8 @@ class Vector:
 
     def getTupple(self):
         return self.x,self.y
+
+    def getNormalized(self):
+        return self.prod(1/self.norme())
+
+

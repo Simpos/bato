@@ -24,16 +24,35 @@ class Bateau:
         self.ax = ax
         self.ay = ay
         self.angle = angle
+
         self.surface = pygame.Surface((SIZE,SIZE),pygame.SRCALPHA)
         self.surface.fill(BLACK)
+
         self.rotated_surface = self.surface
         self.rect = self.surface.get_rect()
+
         self.profilVoile = [1,2,3]
         self.actifProfilVoile = 0
+
         self.direction = Vector(self.vx,self.vy)
 
-    def calculateSpeed(self):
-        pass
+    def update(self,rel):
+        self.x += self.vx
+        self.y += self.vy
+        self.calculateSpeed(rel)
+        print("updated")
+
+    def calculateSpeed(self,relative_wind):
+        portance = relative_wind.getNormalized() * calcPortance(relative_wind.norme(),relative_wind.angle)
+        trainee = relative_wind.getNormalized() * calcTrainee(relative_wind.norme(),relative_wind.angle)
+        self.direction = portance + trainee
+        self.vx = self.direction.x
+        self.vy = self.direction.y
+
+    def speedUpdate(self,vx,vy):
+        self.vx = vx
+        self.vy = vy
+        self.direction = Vector(vx,vy)
 
     def rotate(self,pro):
         self.angle += pro
@@ -52,7 +71,7 @@ class Bateau:
                 self.actifProfilVoile += 1
         else:
             if self.actifProfilVoile > 0:
-                self.profilVoile -= 1
+                self.actifProfilVoile -= 1
 
     def __repr__(self):
         return f"{self.x} {self.y}"
